@@ -290,7 +290,205 @@ Follow the next steps to run the test.
         "Resultado predicción: [1]"
         ```
 
-### Despliegue individual de la API con Docker y uso
+### Individual deployment of the API with Docker and usage
+
+#### Build the image
+
+* Ensure you are in the `itesm-mlops-project/` directory (root folder).
+* Run the following code to build the image:
+
+    ```bash
+    docker build -t titanic-image ./itesm_mlops_project/app/
+    ```
+
+* Inspect the image created by running this command:
+
+    ```bash
+    docker images
+    ```
+
+    Output:
+
+    ```bash
+    REPOSITORY      TAG       IMAGE ID       CREATED       SIZE
+    titanic-image   latest    bb48551cf542   2 hours ago   500MB
+    ```
+
+#### Run Titanic REST API
+
+1. Run the next command to start the `titanic-image` image in a container.
+
+    ```bash
+    docker run -d --rm --name titanic-c -p 8000:8000 titanic-image
+    ```
+
+2. Check the container running.
+
+    ```bash
+    docker ps -a
+    ```
+
+    Output:
+
+    ```bash
+    CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS                    NAMES
+    53d78fb5223f   titanic-image   "uvicorn main:app --…"   19 seconds ago   Up 18 seconds   0.0.0.0:8000->8000/tcp   titanic-c
+    ```
+
+#### Checking endpoints
+
+1. Access `http://127.0.0.1:8000/`, and you will see a message like this `"Titanic classifier is all ready to go!"`
+2. A file called `main_api.log` will be created automatically inside the container. We will inspect it below.
+3. Access `http://127.0.0.1:8000/docs`, the browser will display something like this:
+    ![FastAPI Docs](docs/imgs/fast-api-docs.png)
+
+4. Try running the following predictions with the endpoint by writing the following values:
+    * **Prediction 1**  
+        Request body
+
+        ```bash
+        {
+        "pclass_nan": 0,
+        "age_nan": 0,
+        "sibsp_nan": 0,
+        "parch_nan": 0,
+        "fare_nan": 0,
+        "sex_male": 1,
+        "cabin_Missing": 1,
+        "cabin_rare": 0,
+        "embarked_Q": 1,
+        "embarked_S": 0,
+        "title_Mr": 1,
+        "title_Mrs": 0,
+        "title_rar": 0
+        }
+        ```
+
+        Response body
+        The output will be:
+
+        ```bash
+        "Resultado predicción: [0]"
+        ```
+
+        ![Prediction 1](docs/imgs/prediction-1.png)
+
+    * **Prediction 2**  
+        Request body
+
+        ```bash
+         {
+            "pclass_nan": 0,
+            "age_nan": 0,
+            "sibsp_nan": 1,
+            "parch_nan": 0,
+            "fare_nan": 0,
+            "sex_male": 0,
+            "cabin_Missing": 0,
+            "cabin_rare": 0,
+            "embarked_Q": 1,
+            "embarked_S": 0,
+            "title_Mr": 1,
+            "title_Mrs": 0,
+            "title_rar": 0
+        }
+        ```
+
+        Response body
+        The output will be:
+
+        ```bash
+        "Resultado predicción: [1]"
+        ```
+
+        ![Prediction 2](docs/imgs/prediction-2.png)
+
+#### Opening the logs
+
+1. Run the command
+
+    ```bash
+    docker exec -it titanic-c bash
+    ```
+
+    Output:
+
+    ```bash
+    root@53d78fb5223f:/# 
+    ```
+
+2. Check the existing files:
+
+    ```bash
+    ls
+    ```
+
+    Output:
+
+    ```bash
+    Dockerfile   bin   etc   main.py       ml_models  opt        requirements.txt  sbin  tmp README.md    boot  home  main_api.log  mnt    predictor  root   srv   usr __pycache__  dev   lib   media         models     proc       run     sys   var
+    ```
+
+3. Open the file `main_api.log` and inspect the logs with this command:
+
+    ```bash
+    vim main_api.log
+    ```
+
+    Output:
+
+    ```log
+    2023-08-21 22:27:33,132:main:main:INFO:Titanic classifier is all ready to go!
+    2023-08-21 22:30:18,810:main:main:INFO:Input values: [[0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]]
+    2023-08-21 22:30:18,811:main:main:INFO:Resultado predicción: [0]
+    2023-08-21 22:31:42,424:main:main:INFO:Input values: [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]]
+    2023-08-21 22:31:42,426:main:main:INFO:Resultado predicción: [1]
+
+    ```
+
+4. Copy the logs to the root folder:
+
+    ```bash
+    docker cp titanic-c:/main_api.log .
+    ```
+
+    Output:
+
+    ```bash
+    Successfully copied 2.05kB to .../itesm-mlops-project/.
+    ```
+
+#### Delete container and image
+
+* Stop the container:
+
+    ```bash
+    docker stop titanic-c
+    ```
+
+* Verify it was deleted
+
+    ```bash
+    docker ps -a
+    ```
+
+    Output:
+
+    ```bash
+    CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+    ```
+
+* Delete the image
+
+    ```bash
+    docker rmi titanic-image
+    ```
+
+    Output:
+
+    ```bash
+    Deleted: sha256:bb48551cf5423bad83617ad54a8194501aebbc8f3ebb767de62862100d4e7fd2
+    ```
 
 ### Despliegue completo de todos lo contenedores con Docker Compose y uso
 
