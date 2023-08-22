@@ -90,7 +90,6 @@ Model saved in ./models/logistic_regression_output.pkl
 
 ## Execution of unit tests (Pytest)
 
-
 ### Test location
 
 You can find the test location in the [test](tests) folder, and the following tests:
@@ -320,6 +319,7 @@ Follow the next steps to run the test.
 
     ```bash
     docker run -d --rm --name titanic-c -p 8000:8000 titanic-image
+    docker run -d --rm --name frontend-c -p 3000:5000 frontend-img
     ```
 
 2. Check the container running.
@@ -490,10 +490,198 @@ Follow the next steps to run the test.
     Deleted: sha256:bb48551cf5423bad83617ad54a8194501aebbc8f3ebb767de62862100d4e7fd2
     ```
 
-### Despliegue completo de todos lo contenedores con Docker Compose y uso
+### Complete deployment of all containers with Docker Compose and usage
 
-## Recursos
+#### Create the network
 
-### Fuentes de información
+First, create the network AIService by running this command:
+
+```bash
+docker network create AIservice
+```
+
+#### Run Docker Compose
+
+* Ensure you are in the directory where the docker-compose.yml file is located
+
+* Run the next command to start the App and Frontend APIs
+
+    ```bash
+    docker-compose -f itesm_mlops_project/docker-compose.yml up --build
+    ```
+
+    You will see something like this:
+
+    ```bash
+    Use 'docker scan' to run Snyk tests against images to find vulnerabilities and learn how to fix them
+    Creating itesm_mlops_project-app-1 ... done
+    Creating itesm_mlops_project-frontend-1 ... done
+    itesm_mlops_project-app-1       | INFO:     Will watch for changes in these directories: ['/']
+    itesm_mlops_project-app-1       | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+    itesm_mlops_project-app-1       | INFO:     Started reloader process [1] using StatReload
+    itesm_mlops_project-frontend-1  | INFO:     Will watch for changes in these directories: ['/']
+    itesm_mlops_project-frontend-1  | INFO:     Uvicorn running on http://0.0.0.0:3000 (Press CTRL+C to quit)
+    itesm_mlops_project-frontend-1  | INFO:     Started reloader process [1] using StatReload
+    itesm_mlops_project-app-1       | INFO:     Started server process [8]
+    itesm_mlops_project-app-1       | INFO:     Waiting for application startup.
+    itesm_mlops_project-app-1       | INFO:     Application startup complete.
+    itesm_mlops_project-frontend-1  | INFO:     Started server process [9]
+    itesm_mlops_project-frontend-1  | INFO:     Waiting for application startup.
+    itesm_mlops_project-frontend-1  | INFO:     Application startup complete.
+    ```
+
+#### Checking endpoints in Frontend
+
+1. Access `http://127.0.0.1:3000/`, and you will see a message like this `"Front-end is all ready to go!"`
+2. A file called `frontend.log` will be created automatically inside the container. We will inspect it below.
+3. Access `http://127.0.0.1:3000/docs`, the browser will display something like this:
+    ![Frontend Docs](docs/imgs/frontend-1.png)
+
+4. Try running the following predictions with the endpoint `classify` by writing the following values:
+    * **Prediction 1**  
+        Request body
+
+        ```bash
+        {
+        "pclass_nan": 0,
+        "age_nan": 0,
+        "sibsp_nan": 0,
+        "parch_nan": 0,
+        "fare_nan": 0,
+        "sex_male": 1,
+        "cabin_Missing": 1,
+        "cabin_rare": 0,
+        "embarked_Q": 1,
+        "embarked_S": 0,
+        "title_Mr": 1,
+        "title_Mrs": 0,
+        "title_rar": 0
+        }
+        ```
+
+        Response body
+        The output will be:
+
+        ```bash
+        "Resultado predicción: [0]"
+        ```
+
+        ![Frontend Prediction 1](docs/imgs/frontend-prediction-1.png)
+
+    * **Prediction 2**  
+        Request body
+
+        ```bash
+         {
+            "pclass_nan": 0,
+            "age_nan": 0,
+            "sibsp_nan": 1,
+            "parch_nan": 0,
+            "fare_nan": 0,
+            "sex_male": 0,
+            "cabin_Missing": 0,
+            "cabin_rare": 0,
+            "embarked_Q": 1,
+            "embarked_S": 0,
+            "title_Mr": 1,
+            "title_Mrs": 0,
+            "title_rar": 0
+        }
+        ```
+
+        Response body
+        The output will be:
+
+        ```bash
+        "Resultado predicción: [1]"
+        ```
+
+        ![Frontend Prediction 2](docs/imgs/frontend-prediction-2.png)
+
+#### Opening the logs in Frontend
+
+Open a new terminal, and execute the following commands:
+
+1. Copy the `frontend` logs to the root folder:
+
+    ```bash
+    docker cp itesm_mlops_project-frontend-1:/frontend.log .
+    ```
+
+    Output:
+
+    ```bash
+    Successfully copied 3.12kB to .../itesm-mlops-project/.
+    ```
+
+2. You can inspect the logs and see something similar to this:
+
+    ```bash
+    INFO: 2023-08-21 23:42:00,057|main|Front-end is all ready to go!
+    INFO: 2023-08-21 23:45:04,575|main|Front-end is all ready to go!
+    DEBUG: 2023-08-21 23:45:43,724|main|Incoming input in the front end: {'pclass_nan': 0, 'age_nan': 0, 'sibsp_nan': 0, 'parch_nan': 0, 'fare_nan': 0, 'sex_male': 1, 'cabin_Missing': 1, 'cabin_rare': 0, 'embarked_Q': 1, 'embarked_S': 0, 'title_Mr': 1, 'title_Mrs': 0, 'title_rar': 0}
+    DEBUG: 2023-08-21 23:45:43,742|main|Prediction: "Resultado predicción: [0]"
+    DEBUG: 2023-08-21 23:46:47,024|main|Incoming input in the front end: {'pclass_nan': 0, 'age_nan': 0, 'sibsp_nan': 1, 'parch_nan': 0, 'fare_nan': 0, 'sex_male': 0, 'cabin_Missing': 0, 'cabin_rare': 0, 'embarked_Q': 1, 'embarked_S': 0, 'title_Mr': 1, 'title_Mrs': 0, 'title_rar': 0}
+    DEBUG: 2023-08-21 23:46:47,038|main|Prediction: "Resultado predicción: [1]"
+    ```
+
+#### Opening the logs in App
+
+Open a new terminal, and execute the following commands:
+
+1. Copy the `app` logs to the root folder:
+
+    ```bash
+    docker cp itesm_mlops_project-app-1:/main_api.log .
+    ```
+
+    Output:
+
+    ```bash
+    Successfully copied 2.56kB to .../itesm-mlops-project/.
+    ```
+
+2. You can inspect the logs and see something similar to this:
+
+    ```bash
+    2023-08-21 23:45:43,738:main:main:INFO:Input values: [[0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]]
+    2023-08-21 23:45:43,740:main:main:INFO:Resultado predicción: [0]
+    2023-08-21 23:46:47,034:main:main:INFO:Input values: [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]]
+    2023-08-21 23:46:47,036:main:main:INFO:Resultado predicción: [1]
+    ```
+
+### Delete the containers with Docker Compose
+
+1. Stop the containers that have previously been launched with `docker-compose up`.
+
+    ```bash
+    docker-compose -f itesm_mlops_project/docker-compose.yml stop 
+    ```
+
+    Output:
+
+    ```bash
+    [+] Stopping 2/2
+    ✔ Container itesm_mlops_project-frontend-1  Stopped                           0.3s 
+    ✔ Container itesm_mlops_project-app-1       Stopped                           0.4s 
+    ```
+
+2. Delete the containers stopped from the stage.
+
+    ```bash
+    docker-compose -f itesm_mlops_project/docker-compose.yml rm
+    ```
+
+    Output:
+
+    ```bash
+    ? Going to remove itesm_mlops_project-frontend-1, itesm_mlops_project-app-1 Yes
+    [+] Removing 2/0
+    ✔ Container itesm_mlops_project-app-1       Removed                           0.0s 
+    ✔ Container itesm_mlops_project-frontend-1  Removed                           0.0s 
+    ```
+
+## Resources
+### Information sources
 
 ## Información de contacto
