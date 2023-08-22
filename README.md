@@ -31,7 +31,7 @@ This MLOps project is focused on demonstrating the implementation of a complete 
 
 The purpose is to establish a starting point or "baseline" that will serve as a reference to evaluate future improvements and not only more complex algorithms but more complex components and further deployments.
 
-### Alcance
+### Scope
 
 This project is planned to cover the topics seen in the course syllabus, which was designed to include technical capacity levels 0, 1 and a small part of 2 of [Machine Learning operations maturity model - Azure Architecture Center | Microsoft Learn](https://learn.microsoft.com/en-us/azure/architecture/example-scenario/mlops/mlops-maturity-model).
 
@@ -49,7 +49,7 @@ You can find the Titanic experiments here:
 
 ## Setup
 
-### Versión de Python y paquetes a instalar
+### Python version and packages to install
 
 * Change the directory to the root folder.
 
@@ -690,7 +690,7 @@ Here you will find information about this project and more.
 * [MNA - Master in Applied Artificial Intelligence](https://learn.maestriasydiplomados.tec.mx/pos-programa-mna-v-)
 * [ITESM MLOps Course GitHub Repository](https://github.com/carloslme/itesm-mlops)
 
-## Información de contacto
+## Contact information
 
 * **Credits**
 
