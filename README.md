@@ -319,7 +319,6 @@ Follow the next steps to run the test.
 
     ```bash
     docker run -d --rm --name titanic-c -p 8000:8000 titanic-image
-    docker run -d --rm --name frontend-c -p 3000:5000 frontend-img
     ```
 
 2. Check the container running.
