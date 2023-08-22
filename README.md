@@ -334,7 +334,7 @@ Follow the next steps to run the test.
     53d78fb5223f   titanic-image   "uvicorn main:app --…"   19 seconds ago   Up 18 seconds   0.0.0.0:8000->8000/tcp   titanic-c
     ```
 
-#### Checking endpoints
+#### Checking endpoints for app
 
 1. Access `http://127.0.0.1:8000/`, and you will see a message like this `"Titanic classifier is all ready to go!"`
 2. A file called `main_api.log` will be created automatically inside the container. We will inspect it below.
