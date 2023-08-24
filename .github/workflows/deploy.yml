@@ -5,26 +5,29 @@ on:
     branches: [terraform]
 
 jobs:
-  deployTerraform:
-    name: Deploy GCP Infrastructure via Terraform
-    runs-on: ubuntu-latest
-    outputs:
-      SERVER_PUBLIC_IP: ${{ steps.set-ip.outputs.instance_public_ip}}
-    steps:
-      - name: setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_wrapper: false
-      - name: Terraform init
-        id: init
-        run: |
-          terraform init
-          terraform validate
-          terraform plan 
-          terraform apply -auto-approve
-        working-directory: terraform
-      - name: Set output
-        id: set-ip
-        run: |-
-          echo "instance_public_ip=$(terraform output --raw instance_public_ip)" >> $GITHUB_OUTPUT
-        working-directory: terraform
+    deploy:
+        runs-on: ubuntu-latest
+        
+        steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v2
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v2
+          with:
+            terraform_wrapper: false
+    
+        - name: Configure Google Cloud credentials
+          uses: google-github-actions/setup-gcloud@master
+          with:
+            credentials: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+            project_id: itesm-mlops
+    
+        - name: Terraform Init
+          run: terraform init terraform
+    
+        - name: Terraform Plan
+          run: terraform plan -var="project_id=itesm-mlops" terraform
+    
+        - name: Terraform Apply
+          run: terraform apply -auto-approve -var="project_id=itesm-mlops" terraform
