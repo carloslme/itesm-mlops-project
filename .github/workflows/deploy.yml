@@ -1,0 +1,30 @@
+name: Model Deployment
+
+on:
+  push:
+    branches: [terraform]
+
+jobs:
+  deployTerraform:
+    name: Deploy GCP Infrastructure via Terraform
+    runs-on: ubuntu-latest
+    outputs:
+      SERVER_PUBLIC_IP: ${{ steps.set-ip.outputs.instance_public_ip}}
+    steps:
+      - name: setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+      - name: Terraform init
+        id: init
+        run: |
+          terraform init
+          terraform validate
+          terraform plan 
+          terraform apply -auto-approve
+        working-directory: terraform
+      - name: Set output
+        id: set-ip
+        run: |-
+          echo "instance_public_ip=$(terraform output --raw instance_public_ip)" >> $GITHUB_OUTPUT
+        working-directory: terraform
