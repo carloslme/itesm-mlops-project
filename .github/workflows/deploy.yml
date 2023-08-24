@@ -1,0 +1,33 @@
+name: Model Deployment
+
+on:
+  push:
+    branches: [terraform]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        
+        steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v2
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v2
+          with:
+            terraform_wrapper: false
+    
+        - name: Configure Google Cloud credentials
+          uses: google-github-actions/setup-gcloud@v1
+          with:
+            credentials: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+            project_id: itesm-mlops
+    
+        - name: Terraform Init
+          run: terraform init
+    
+        - name: Terraform Plan
+          run: terraform plan -var="project_id=itesm-mlops"
+    
+        - name: Terraform Apply
+          run: terraform apply -auto-approve -var="project_id=itesm-mlops"
