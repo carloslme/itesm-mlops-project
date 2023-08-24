@@ -24,10 +24,10 @@ jobs:
             project_id: itesm-mlops
     
         - name: Terraform Init
-          run: terraform init terraform
+          run: terraform init
     
         - name: Terraform Plan
-          run: terraform plan -var="project_id=itesm-mlops" terraform
+          run: terraform plan -var="project_id=itesm-mlops"
     
         - name: Terraform Apply
-          run: terraform apply -auto-approve -var="project_id=itesm-mlops" terraform
+          run: terraform apply -auto-approve -var="project_id=itesm-mlops"
