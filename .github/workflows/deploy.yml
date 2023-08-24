@@ -3,6 +3,11 @@ name: Model Deployment
 on:
   push:
     branches: [terraform]
+    
+  workflow_call:
+    secrets:
+      GOOGLE_APPLICATION_CREDENTIALS:
+        required: true
 
 jobs:
     deploy:
