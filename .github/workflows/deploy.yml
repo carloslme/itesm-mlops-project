@@ -12,6 +12,7 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-latest
+        environment: itesm-mlops
             # Add "id-token" with the intended permissions.
         permissions:
           contents: 'read'
